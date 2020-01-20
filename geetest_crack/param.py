@@ -2,8 +2,12 @@ import base64
 import json
 import random
 import re
+from io import BytesIO
 
 import execjs
+import requests
+from PIL import Image
+from requests import Session
 
 from geetest_crack.config import common_headers, token_url, app_id, device_type, login_type, pwd_encrypt_js_path, \
     full_page_t1_js_path, full_page_w1_js_path, full_page_w2_js_path
@@ -82,7 +86,7 @@ def get_s():
     return _() + _() + _() + _()
 
 
-def get_token(phone, device_id, device_ip):
+def get_token(session, phone, device_id, device_ip):
     """获取token参数"""
     form_data = {
         'appId': app_id,
@@ -92,7 +96,7 @@ def get_token(phone, device_id, device_ip):
         'deviceId': device_id,
         'deviceIp': device_ip
     }
-    resp = fetch(token_url, method='post', data=form_data)
+    resp = fetch(session=session, url=token_url, method='post', data=form_data)
     return '' if resp is None else resp.json()['data']['token']
 
 
@@ -130,3 +134,12 @@ def get_full_page_w2(gt, challenge, s):
     return full_page_w2_js.call('get_w', gt, challenge, s)
 
 
+def get_captcha_image(session, image_url) -> Image:
+    """获取验证码图片Image对象"""
+    resp = fetch(session, url=image_url, headers=common_headers)
+    return None if resp is None else Image.open(BytesIO(resp.content))
+
+
+def session() -> Session:
+    """获取session对象"""
+    return requests.session()

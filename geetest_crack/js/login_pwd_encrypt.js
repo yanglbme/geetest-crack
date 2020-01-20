@@ -3596,22 +3596,16 @@ SM2CipherMode = {
 };
 var localEccX = "dd8ed256555a4b748b9ea17de33449e7b578571f2f93917637fa3a6d3bdd6494";
 var localEccY = "dfedf198794efef8f69931aaea07f6b95556d464ddcfe8821aff0b3ffa8f93ef";
-// var pwdstr = _ts.length + _ts + pwdlen + pwd;
-// var buttonTest = document.getElementById("b1");
 function getSM2Pwd(sm2pwd) {
     return 'CN-S' + sm2pwd;
 }
 
 
 function pwdEncrypt(pwd){
-    // var pwd = document.getElementById(inputId).value;
     var pwdlen = pwd.length;
     if(pwdlen < 10) pwdlen = "0" + pwdlen;
 
     var _ts = new Date().getTime();
-    // console.log(_ts.length, _ts, pwdlen, pwd);
-
-    // var pwdstr = "13157900242077108Hc930820";
     var pwdstr = '13' + _ts + pwdlen + pwd;
     var pwdData = CryptoJS.enc.Utf8.parse(pwdstr);
     var cipherMode = "1";
@@ -3620,9 +3614,5 @@ function pwdEncrypt(pwd){
     pwdData = cipher.GetWords(pwdData.toString());
     var encryptData = cipher.Encrypt(userKey, pwdData);
     var sm2pwd = getSM2Pwd(encryptData.toUpperCase());
-    // console.log(sm2pwd);
-    return sm2pwd; // ??????
+    return sm2pwd;
 }
-
-// console.log(pwdEncrypt("Hc930820"));
-

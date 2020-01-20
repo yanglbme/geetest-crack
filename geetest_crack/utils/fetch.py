@@ -12,13 +12,10 @@ def need_retry(exception):
     return result
 
 
-session = requests.session()
-
-
-def fetch(url, method='get', **kwargs):
+def fetch(session, url, method='get', **kwargs):
     @retry(stop_max_attempt_number=retry_max_number, wait_random_min=retry_min_random_wait,
            wait_random_max=retry_max_random_wait, retry_on_exception=need_retry)
-    def _fetch(url, **kwargs) -> Response:
+    def _fetch(session, url, **kwargs) -> Response:
         # kwargs.update({'verify': False})
         kwargs.update({'timeout': fetch_timeout})
         response = session.post(url, **kwargs) if method == 'post' else session.get(url, **kwargs)
@@ -27,7 +24,7 @@ def fetch(url, method='get', **kwargs):
         return response
 
     try:
-        resp = _fetch(url, **kwargs)
+        resp = _fetch(session, url, **kwargs)
         return resp
     except (requests.ConnectionError, requests.ReadTimeout):
         return None
