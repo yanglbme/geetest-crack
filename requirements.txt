@@ -1,2 +1,3 @@
-retrying
 requests==2.22.0
+retrying==1.3.3
+PyExecJS==1.5.1

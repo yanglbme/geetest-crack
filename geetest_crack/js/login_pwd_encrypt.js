@@ -3621,7 +3621,7 @@ function pwdEncrypt(pwd){
     var encryptData = cipher.Encrypt(userKey, pwdData);
     var sm2pwd = getSM2Pwd(encryptData.toUpperCase());
     // console.log(sm2pwd);
-    return sm2pwd; // ×îÖÕ½á¹û
+    return sm2pwd; // ??????
 }
 
 // console.log(pwdEncrypt("Hc930820"));

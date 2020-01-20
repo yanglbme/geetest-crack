@@ -2,7 +2,9 @@
 token_url = 'https://paicc-core.pingan.com.cn/paicc-core-web/webapi/isShowImageVcode.do'
 gt_register_url = 'https://paicc-core.pingan.com.cn/paicc-core-web/webapi/gt/register'
 get_php_url = 'https://captcha-api.pingan.com/get.php'
+ajax_php_url = 'https://captcha-api.pingan.com/ajax.php'
 pc_login_url = 'https://paicc-core.pingan.com.cn/paicc-core-web/webapi/login.view?tabs=account&appId=16666'
+
 
 # params
 app_id = '16666'
@@ -20,7 +22,9 @@ common_headers = {
 
 # js path
 pwd_encrypt_js_path = './js/login_pwd_encrypt.js'
-
+full_page_t1_js_path = './js/fullpage_t1.js'
+full_page_w1_js_path = './js/fullpage_w1.js'
+full_page_w2_js_path = './js/fullpage_w2.js'
 
 # retrying
 retry_max_number = 10

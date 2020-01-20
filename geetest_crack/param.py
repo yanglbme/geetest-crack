@@ -5,7 +5,8 @@ import re
 
 import execjs
 
-from geetest_crack.config import common_headers, token_url, app_id, device_type, login_type, pwd_encrypt_js_path
+from geetest_crack.config import common_headers, token_url, app_id, device_type, login_type, pwd_encrypt_js_path, \
+    full_page_t1_js_path, full_page_w1_js_path, full_page_w2_js_path
 from geetest_crack.utils.fetch import fetch
 
 
@@ -102,10 +103,30 @@ def get_js_object(js_file_path):
         return execjs.compile(js_file)
 
 
+pwd_encrypt_js = get_js_object(pwd_encrypt_js_path)
+full_page_t1_js = get_js_object(full_page_t1_js_path)
+full_page_w1_js = get_js_object(full_page_w1_js_path)
+full_page_w2_js = get_js_object(full_page_w2_js_path)
+
+
 def get_encrypt_pwd(pwd):
     """获取加密后的密码"""
-    pwd_encrypt_js = get_js_object(pwd_encrypt_js_path)
     return pwd_encrypt_js.call('pwdEncrypt', pwd)
 
+
+def get_full_page_t1(s):
+    """获取fullpage的t1参数"""
+    return full_page_t1_js.call('get_t', s)
+
+
+def get_full_page_w1(gt, challenge, s):
+    """获取fullpage的w1参数"""
+    t = get_full_page_t1(s)
+    return full_page_w1_js.call('get_w', gt, challenge, s, t)
+
+
+def get_full_page_w2(gt, challenge, s):
+    """获取fullpage的w2参数"""
+    return full_page_w2_js.call('get_w', gt, challenge, s)
 
 
