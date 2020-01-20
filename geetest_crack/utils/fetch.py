@@ -15,13 +15,13 @@ def need_retry(exception):
 session = requests.session()
 
 
-def fetch(url, **kwargs):
+def fetch(url, method='get', **kwargs):
     @retry(stop_max_attempt_number=retry_max_number, wait_random_min=retry_min_random_wait,
            wait_random_max=retry_max_random_wait, retry_on_exception=need_retry)
     def _fetch(url, **kwargs) -> Response:
         # kwargs.update({'verify': False})
         kwargs.update({'timeout': fetch_timeout})
-        response = session.get(url, **kwargs)
+        response = session.post(url, **kwargs) if method == 'post' else session.get(url, **kwargs)
         if response.status_code != 200:
             raise requests.ConnectionError('Expected status code 200, but got {}'.format(response.status_code))
         return response
