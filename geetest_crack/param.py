@@ -10,7 +10,8 @@ from PIL import Image
 from requests import Session
 
 from geetest_crack.config import common_headers, token_url, app_id, device_type, login_type, pwd_encrypt_js_path, \
-    full_page_t1_js_path, full_page_w1_js_path, full_page_w2_js_path
+    full_page_t1_js_path, full_page_w1_js_path, full_page_w2_js_path, slide_track, u_js_path, slide_u_js_path, \
+    slide_a_js_path
 from geetest_crack.utils.fetch import fetch
 
 
@@ -111,6 +112,9 @@ pwd_encrypt_js = get_js_object(pwd_encrypt_js_path)
 full_page_t1_js = get_js_object(full_page_t1_js_path)
 full_page_w1_js = get_js_object(full_page_w1_js_path)
 full_page_w2_js = get_js_object(full_page_w2_js_path)
+u_js = get_js_object(u_js_path)
+slide_u_js = get_js_object(slide_u_js_path)
+slide_a_js = get_js_object(slide_a_js_path)
 
 
 def get_encrypt_pwd(pwd):
@@ -134,6 +138,22 @@ def get_full_page_w2(gt, challenge, s):
     return full_page_w2_js.call('get_w', gt, challenge, s)
 
 
+def get_slide_w(gt, challenge, s, offset, track):
+    """获取slide的w参数"""
+    u = {
+        'lang': 'zh-cn',
+        'userresponse': u_js.call('getUserResponse', offset - 1, challenge),
+        'passtime': track[-1][-1],
+        'imgload': random.randint(110, 180),
+        'a': u_js.call("mouse_encrypt", track),
+        'ep': {"v": "pingan.1.2", "f": u_js.call("lmWn", gt + challenge)},
+        'rp': u_js.call("lmWn", gt + challenge[0:32] + str(track[-1][-1]))
+    }
+    u = slide_u_js.call('_encrypt', u, s)
+    a = slide_a_js.call('get_a', s)
+    return u + a
+
+
 def get_captcha_image(session, image_url) -> Image:
     """获取验证码图片Image对象"""
     resp = fetch(session, url=image_url, headers=common_headers)
@@ -143,3 +163,10 @@ def get_captcha_image(session, image_url) -> Image:
 def session() -> Session:
     """获取session对象"""
     return requests.session()
+
+
+def get_track(offset=0):
+    """根据偏移量获取轨迹"""
+    for track in slide_track:
+        if offset == track[-1][0]:
+            return track

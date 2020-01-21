@@ -25,6 +25,9 @@ pwd_encrypt_js_path = './js/login_pwd_encrypt.js'
 full_page_t1_js_path = './js/fullpage_t1.js'
 full_page_w1_js_path = './js/fullpage_w1.js'
 full_page_w2_js_path = './js/fullpage_w2.js'
+u_js_path = './js/u_params.js'
+slide_a_js_path = './js/slide_a.js'
+slide_u_js_path = './js/encrypt.js'
 
 # retrying
 retry_max_number = 10
