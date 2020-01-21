@@ -10,6 +10,7 @@ from geetest_crack.param import get_s, get_encrypt_pwd, get_jt_safe_key, get_tok
     get_full_page_w2, session, get_track, get_slide_w
 from geetest_crack.utils.captcha import calculate_offset
 from geetest_crack.utils.fetch import fetch
+from geetest_crack.utils.response import Resp
 from geetest_crack.utils.times import now_str
 
 
@@ -31,12 +32,14 @@ class LoginSpider:
         self.device_id = get_device()
         self.device_ip = get_device()
         self.token = get_token(self.session, phone, self.device_id, self.device_ip)
+        self.res = Resp.SUCCESS
 
     def set_gt_challenge(self) -> bool:
         """发送网络请求，拿到gt和challenge"""
         params = dict(t=now_str())
         resp = fetch(self.session, url=gt_register_url, headers=common_login_headers, params=params)
         if resp is None:
+            self.res = Resp.TIMEOUT
             return False
         res = resp.json()
         self.gt, self.challenge = res['gt'], res['challenge']
@@ -52,6 +55,8 @@ class LoginSpider:
             'callback': 'geetest_' + now_str()
         }
         resp = fetch(self.session, url=get_php_url, headers=common_login_headers, params=params)
+        if resp is None:
+            self.res = Resp.TIMEOUT
         return resp is not None
 
     def ajax_php(self, step=1, params=None):
@@ -64,15 +69,17 @@ class LoginSpider:
                 'gt': self.gt,
                 'challenge': self.challenge,
                 'lang': 'zh-cn',
-                'w': get_full_page_w2(self.gt, self.challenge, self.s),
+                'w': get_full_page_w2(self.gt, self.challenge, self.s) + '1',
                 'callback': 'geetest_' + now_str()
             }
         resp = fetch(self.session, url=ajax_php_url, headers=common_login_headers, params=params)
         if resp is None:
+            self.res = Resp.TIMEOUT
             return False
         if step != 1:
             res = json.loads(re.search(r'\((.*?)\)', resp.text, re.S).group(1))
             if res['data']['result'] != 'success':
+                self.res = Resp.SLIDE_ERR
                 return False
             self.validate = res['data']['validate']
             self.sec_code = self.validate + '|jordan'
@@ -96,6 +103,7 @@ class LoginSpider:
         }
         resp = fetch(self.session, url=get_php_url, headers=common_login_headers, params=params)
         if resp is None:
+            self.res = Resp.TIMEOUT
             return False
         res = json.loads(re.search(r'\((.*?)\)', resp.text, re.S).group(1))
 
@@ -113,6 +121,7 @@ class LoginSpider:
         resp1 = fetch(self.session, url=self.bg_url, headers=common_login_headers)
         resp2 = fetch(self.session, url=self.full_bg_url, headers=common_login_headers)
         if not (resp1 and resp2):
+            self.res = Resp.TIMEOUT
             return False
         img1 = Image.open(BytesIO(resp1.content))
         img2 = Image.open(BytesIO(resp2.content))
@@ -122,6 +131,8 @@ class LoginSpider:
 
         # 根据偏移量获取轨迹
         self.track = get_track(self.offset)
+        if self.track is None:
+            self.res = Resp.TRACK_ERR
         return self.track is not None
 
     def slide(self):
@@ -155,13 +166,14 @@ class LoginSpider:
 
         resp = fetch(self.session, url=acc_login_url, method='post', headers=common_login_headers, data=form_data)
         if resp is None:
+            self.res = Resp.TIMEOUT
             return False
         res = resp.json()
         if res['returnCode'] != '0':
             if res['returnCode'] == 'BIZ_ERROR_018' and '账户名或密码错误' in res['returnMsg']:
-                print('用户名或密码错误')
+                self.res = Resp.WRONG_NAME_OR_PWD
             if res['returnCode'] == 'COMMON_ERROR_022':
-                print('非法操作')
+                self.res = Resp.ILLEGAL_ERR
             return False
 
         result_token = resp.json()['data']['resultToken']
@@ -174,12 +186,14 @@ class LoginSpider:
             'resultToken': result_token,
             'ptag': ''
         }
+
         resp = fetch(self.session, url=login_success_handler_url, method='post', headers=common_login_headers,
                      data=form_data)
         return resp is not None
 
     def run(self):
         self.set_gt_challenge() and self.get_php() and self.ajax_php() and self.get_slide_images() and self.get_track() and self.slide() and self.login()
+        print(self.res)
 
 
 spider = LoginSpider('13317178767', '123456789x')

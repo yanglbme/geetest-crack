@@ -3,6 +3,7 @@ from requests import Response
 from retrying import retry
 
 from geetest_crack.config import retry_max_number, retry_min_random_wait, retry_max_random_wait, fetch_timeout
+from geetest_crack.utils.logger import logger
 
 
 def need_retry(exception):
@@ -26,5 +27,6 @@ def fetch(session, url, method='get', **kwargs):
     try:
         resp = _fetch(session, url, **kwargs)
         return resp
-    except (requests.ConnectionError, requests.ReadTimeout):
+    except Exception as e:
+        logger.error('Something got wrong, error msg:{}'.format(e))
         return None
