@@ -5,7 +5,7 @@ from io import BytesIO
 from PIL import Image
 
 from geetest_crack.config import common_login_headers, gt_register_url, get_php_url, ajax_php_url, app_id, device_type, \
-    redirect_flag, sign_type, acc_login_url, login_success_handler_url
+    redirect_flag, sign_type, acc_login_url, login_success_handler_url, prefix_url
 from geetest_crack.param import get_s, get_encrypt_pwd, get_jt_safe_key, get_token, get_device, get_full_page_w1, \
     get_full_page_w2, session, get_track, get_slide_w
 from geetest_crack.utils.captcha import calculate_offset
@@ -98,11 +98,10 @@ class LoginSpider:
         if resp is None:
             return False
         res = json.loads(re.search(r'\((.*?)\)', resp.text, re.S).group(1))
-        prefix = 'https://captcha-static.pingan.com/'
 
         # 获得滑动验证码图片的URL(带缺口+不带缺口)
-        self.bg_url = prefix + res['data']['bg']
-        self.full_bg_url = prefix + res['data']['fullbg']
+        self.bg_url = prefix_url + res['data']['bg']
+        self.full_bg_url = prefix_url + res['data']['fullbg']
 
         # 更新gt/challenge
         self.gt = res['data']['gt']

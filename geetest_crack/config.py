@@ -1,4 +1,5 @@
 # urls
+prefix_url = 'https://captcha-static.pingan.com/'
 token_url = 'https://paicc-core.pingan.com.cn/paicc-core-web/webapi/isShowImageVcode.do'
 gt_register_url = 'https://paicc-core.pingan.com.cn/paicc-core-web/webapi/gt/register'
 get_php_url = 'https://captcha-api.pingan.com/get.php'
