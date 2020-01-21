@@ -4,7 +4,8 @@ from io import BytesIO
 
 from PIL import Image
 
-from geetest_crack.config import common_headers, gt_register_url, get_php_url, ajax_php_url
+from geetest_crack.config import common_login_headers, gt_register_url, get_php_url, ajax_php_url, app_id, device_type, \
+    redirect_flag, sign_type, acc_login_url, login_success_handler_url
 from geetest_crack.param import get_s, get_encrypt_pwd, get_jt_safe_key, get_token, get_device, get_full_page_w1, \
     get_full_page_w2, session, get_track, get_slide_w
 from geetest_crack.utils.captcha import calculate_offset
@@ -12,7 +13,7 @@ from geetest_crack.utils.fetch import fetch
 from geetest_crack.utils.times import now_str
 
 
-class Spider:
+class LoginSpider:
     def __init__(self, phone, password):
         self.login_name = str(phone)
         self.login_pwd = get_encrypt_pwd(password)
@@ -34,7 +35,7 @@ class Spider:
     def set_gt_challenge(self) -> bool:
         """发送网络请求，拿到gt和challenge"""
         params = dict(t=now_str())
-        resp = fetch(self.session, url=gt_register_url, headers=common_headers, params=params)
+        resp = fetch(self.session, url=gt_register_url, headers=common_login_headers, params=params)
         if resp is None:
             return False
         res = resp.json()
@@ -50,7 +51,7 @@ class Spider:
             'w': get_full_page_w1(self.gt, self.challenge, self.s),
             'callback': 'geetest_' + now_str()
         }
-        resp = fetch(self.session, url=get_php_url, headers=common_headers, params=params)
+        resp = fetch(self.session, url=get_php_url, headers=common_login_headers, params=params)
         return resp is not None
 
     def ajax_php(self, step=1, params=None):
@@ -66,12 +67,13 @@ class Spider:
                 'w': get_full_page_w2(self.gt, self.challenge, self.s),
                 'callback': 'geetest_' + now_str()
             }
-        resp = fetch(self.session, url=ajax_php_url, headers=common_headers, params=params)
+        resp = fetch(self.session, url=ajax_php_url, headers=common_login_headers, params=params)
         if resp is None:
             return False
         if step != 1:
-            print(resp.text)
             res = json.loads(re.search(r'\((.*?)\)', resp.text, re.S).group(1))
+            if res['data']['result'] != 'success':
+                return False
             self.validate = res['data']['validate']
             self.sec_code = self.validate + '|jordan'
         return True
@@ -92,7 +94,7 @@ class Spider:
             'width': '100%',
             'callback': 'geetest_' + now_str()
         }
-        resp = fetch(self.session, url=get_php_url, headers=common_headers, params=params)
+        resp = fetch(self.session, url=get_php_url, headers=common_login_headers, params=params)
         if resp is None:
             return False
         res = json.loads(re.search(r'\((.*?)\)', resp.text, re.S).group(1))
@@ -109,8 +111,8 @@ class Spider:
 
     def get_track(self):
         """获取滑动轨迹"""
-        resp1 = fetch(self.session, url=self.bg_url, headers=common_headers)
-        resp2 = fetch(self.session, url=self.full_bg_url, headers=common_headers)
+        resp1 = fetch(self.session, url=self.bg_url, headers=common_login_headers)
+        resp2 = fetch(self.session, url=self.full_bg_url, headers=common_login_headers)
         if not (resp1 and resp2):
             return False
         img1 = Image.open(BytesIO(resp1.content))
@@ -124,7 +126,7 @@ class Spider:
         return self.track is not None
 
     def slide(self):
-        print(self.track)
+        """滑动滑块"""
         params = {
             'gt': self.gt,
             'challenge': self.challenge,
@@ -134,10 +136,52 @@ class Spider:
         }
         return self.ajax_php(step=2, params=params)
 
+    def login(self):
+        """携带各个加密参数登录"""
+        form_data = {
+            'appId': app_id,
+            'loginName': self.login_name,
+            'loginPwd': self.login_pwd,
+            'geetest_challenge': self.challenge,
+            'geetest_validate': self.validate,
+            'geetest_seccode': self.sec_code,
+            'deviceId': self.device_id,
+            'deviceIp': self.device_ip,
+            'deviceType': device_type,
+            'jtSafeKey': self.jt_safe_key,
+            'token': self.token,
+            'fcmmRedirectFlag': redirect_flag,
+            'signtype': sign_type
+        }
+
+        resp = fetch(self.session, url=acc_login_url, method='post', headers=common_login_headers, data=form_data)
+        if resp is None:
+            return False
+        res = resp.json()
+        if res['returnCode'] != '0':
+            if res['returnCode'] == 'BIZ_ERROR_018' and '账户名或密码错误' in res['returnMsg']:
+                print('用户名或密码错误')
+            if res['returnCode'] == 'COMMON_ERROR_022':
+                print('非法操作')
+            return False
+
+        result_token = resp.json()['data']['resultToken']
+        form_data = {
+            'appId': app_id,
+            'assert': '',
+            'assertSign': '',
+            'des3Assert': '',
+            'des3AssertSign': '',
+            'resultToken': result_token,
+            'ptag': ''
+        }
+        resp = fetch(self.session, url=login_success_handler_url, method='post', headers=common_login_headers,
+                     data=form_data)
+        return resp is not None
+
     def run(self):
-        self.set_gt_challenge() and self.get_php() and self.ajax_php() and self.get_slide_images() and self.get_track() and self.slide()
-        print(self.validate)
+        self.set_gt_challenge() and self.get_php() and self.ajax_php() and self.get_slide_images() and self.get_track() and self.slide() and self.login()
 
 
-spider = Spider('13434958889', 'x12356789')
+spider = LoginSpider('13317178767', '123456789x')
 spider.run()

@@ -4,7 +4,8 @@ gt_register_url = 'https://paicc-core.pingan.com.cn/paicc-core-web/webapi/gt/reg
 get_php_url = 'https://captcha-api.pingan.com/get.php'
 ajax_php_url = 'https://captcha-api.pingan.com/ajax.php'
 pc_login_url = 'https://paicc-core.pingan.com.cn/paicc-core-web/webapi/login.view?tabs=account&appId=16666'
-
+acc_login_url = 'https://paicc-core.pingan.com.cn/paicc-core-web/webapi/accLoginPC.do'
+login_success_handler_url = 'https://one.pingan.com.cn/pa/paone-service/loginSuccessHandler.do'
 
 # params
 app_id = '16666'
@@ -15,9 +16,11 @@ login_type = 'account'
 
 # http
 fetch_timeout = 5
-common_headers = {
+common_login_headers = {
+    'Origin': 'https://paicc-core.pingan.com.cn',
+    'Referer': 'https://paicc-core.pingan.com.cn/paicc-core-web/webapi/login.view?tabs=account&appId=16666',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                  'Chrome/79.0.3945.117 Safari/537.36',
+                  'Chrome/79.0.3945.117 Safari/537.36'
 }
 
 # js path

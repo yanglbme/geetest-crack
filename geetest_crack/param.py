@@ -9,7 +9,7 @@ import requests
 from PIL import Image
 from requests import Session
 
-from geetest_crack.config import common_headers, token_url, app_id, device_type, login_type, pwd_encrypt_js_path, \
+from geetest_crack.config import common_login_headers, token_url, app_id, device_type, login_type, pwd_encrypt_js_path, \
     full_page_t1_js_path, full_page_w1_js_path, full_page_w2_js_path, slide_track, u_js_path, slide_u_js_path, \
     slide_a_js_path
 from geetest_crack.utils.fetch import fetch
@@ -29,7 +29,7 @@ def get_jt_safe_key() -> str:
 
     r = {
         'sdkversion': '1.3.0',
-        'user_agent': common_headers['User-Agent'],
+        'user_agent': common_login_headers['User-Agent'],
         'language': 'zh-CN',
         'languages': 'zh-CN,zh',
         'color_depth': 24,
@@ -57,7 +57,7 @@ def get_jt_safe_key() -> str:
         'navigator_cookieEnabled': True,
         'navigator_appCodeName': 'Mozilla',
         'navigator_appName': 'Netscape',
-        'navigator_appVersion': common_headers['User-Agent'],
+        'navigator_appVersion': common_login_headers['User-Agent'],
         'navigator_product': 'Gecko',
         'navigator_onLine': True,
         'navigator_deviceMemory': 8,
@@ -156,7 +156,7 @@ def get_slide_w(gt, challenge, s, offset, track):
 
 def get_captcha_image(session, image_url) -> Image:
     """获取验证码图片Image对象"""
-    resp = fetch(session, url=image_url, headers=common_headers)
+    resp = fetch(session, url=image_url, headers=common_login_headers)
     return None if resp is None else Image.open(BytesIO(resp.content))
 
 
