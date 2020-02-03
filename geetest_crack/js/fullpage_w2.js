@@ -197,8 +197,7 @@ function get_w(gt, challenge, s) {
     var path = [["move",[242,260],0],["move",[-21,0],10],["move",[-25,0],34],["move",[-2,-1],15],["move",[-1,-1],1],["move",[-1,-2],8],["move",[-2,-4],8],["move",[-1,-2],8],["move",[-4,-3],8],["move",[-1,-2],8],["move",[-5,-4],8],["move",[-2,-1],8],["move",[-4,-3],8],["move",[-2,-1],8],["move",[-3,-1],8],["move",[-3,0],8],["move",[-1,-1],16],["move",[-1,-1],25],["move",[0,-1],89],["move",[0,-2],7],["move",[0,-3],8],["move",[3,-2],8],["move",[1,-2],9],["move",[3,-3],6],["move",[0,-3],8],["move",[2,-4],9],["move",[2,-3],9],["move",[0,-1],7],["move",[1,-2],7],["move",[0,-1],16],["down",[0,0],62],["up",[0,0],50]];
 
     function _RCHD() {
-        // 需要构造参数
-        var r = {"LINK":2,"STYLE":1,"SCRIPT":17,"INPUT":9,"DIV":33,"LABEL":3,"IMG":3,"UL":1,"LI":71,"SPAN":1,"A":3,"IFRAME":1,"textLength":5498,"HTMLLength":15127,"documentMode":"CSS1Compat","browserLanguage":"en-US","browserLanguages":"en-US,zh,zh-CN","devicePixelRatio":2,"colorDepth":24,"userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36","cookieEnabled":1,"netEnabled":1,"innerWidth":377,"innerHeight":826,"outerWidth":1536,"outerHeight":937,"screenWidth":1536,"screenHeight":960,"screenAvailWidth":1536,"screenAvailHeight":937,"screenLeft":0,"screenTop":23,"screenAvailLeft":0,"screenAvailTop":23,"localStorageEnabled":1,"sessionStorageEnabled":1,"indexedDBEnabled":1,"platform":"MacIntel","doNotTrack":0,"timezone":-8,"canvas2DFP":"b2fe547f0bec5970946f825cd58e1b80","canvas3DFP":"3c904c7550e442c22a5ad0d73a074672","plugins":"internal-pdf-viewer,mhjfbmdgcfjbbpaeojofohoefgiehjai,internal-nacl-plugin","maxTouchPoints":0,"flashEnabled":-1,"javaEnabled":0,"hardwareConcurrency":16,"jsFonts":"","mediaDevices":-1,"performanceTiming":"","timestamp":1578278143968,"st":"4e1052","deviceorientation":false,"touchEvent":false,"internalip":"10.1.36.133"}
+        var r = {"LINK":2,"STYLE":1,"SCRIPT":17,"INPUT":9,"DIV":33,"LABEL":3,"IMG":3,"UL":1,"LI":71,"SPAN":1,"A":3,"IFRAME":1,"textLength":5498,"HTMLLength":15127,"documentMode":"CSS1Compat","browserLanguage":"en-US","browserLanguages":"en-US,zh,zh-CN","devicePixelRatio":2,"colorDepth":24,"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36","cookieEnabled":1,"netEnabled":1,"innerWidth":377,"innerHeight":826,"outerWidth":1536,"outerHeight":937,"screenWidth":1536,"screenHeight":960,"screenAvailWidth":1536,"screenAvailHeight":937,"screenLeft":0,"screenTop":23,"screenAvailLeft":0,"screenAvailTop":23,"localStorageEnabled":1,"sessionStorageEnabled":1,"indexedDBEnabled":1,"platform":"MacIntel","doNotTrack":0,"timezone":-8,"canvas2DFP":"b2fe547f0bec5970946f825cd58e1b80","canvas3DFP":"3c904c7550e442c22a5ad0d73a074672","plugins":"internal-pdf-viewer,mhjfbmdgcfjbbpaeojofohoefgiehjai,internal-nacl-plugin","maxTouchPoints":0,"flashEnabled":-1,"javaEnabled":0,"hardwareConcurrency":16,"jsFonts":"","mediaDevices":-1,"performanceTiming":"","timestamp":1578278143968,"st":"4e1052","deviceorientation":false,"touchEvent":false,"internalip":"10.1.36.133"}
 
         r["plugins"] = "";
         r["performanceTiming"] = "-1,-1,0,3,0,0,14,1,8,3,17,17,24,552,552,559,-1,-1,-1,-1";
@@ -229,12 +228,12 @@ function get_w(gt, challenge, s) {
           , t = Math.random() * e * 9;
         t += e;
         r["st"] = Math.round(t).toString(16);
-        // 使用默认, ip可能需要更改
+        // ??????, ip???????????
         // var BvIc = {
         //     "deviceorientation": false,
         //     "mouseEvent": false,
         //     "touchEvent": false,
-        //     "ip": undefined // 正常需要本机IP
+        //     "ip": undefined // ???????????IP
         // }
         // r["deviceorientation"] = BvIc["deviceorientation"];
         // r["touchEvent"] = BvIc["touchEvent"];
@@ -1824,7 +1823,7 @@ function get_w(gt, challenge, s) {
     }
 
 
-    /**计算最终结果 */
+    /**?????????? */
     var GxkI = {
         "BtcL": {
             "CWUe": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()",
@@ -2958,7 +2957,7 @@ function get_w(gt, challenge, s) {
         i: GxkI["PwRX"](n),
         hi: iEe_(n),
         vip_order: -1,
-        ua: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36",
+        ua: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36",
         ct: -1,
         passtime: o,
         reservedParam: null,

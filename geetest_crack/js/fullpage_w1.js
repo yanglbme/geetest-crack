@@ -631,7 +631,6 @@ function get_w(gt, challenge, s, t) {
     return n + t;
 
     function _RCHD() {
-        // 需要构造参数
         var r = {
             "LINK": 2,
             "STYLE": 1,
@@ -652,7 +651,7 @@ function get_w(gt, challenge, s, t) {
             "browserLanguages": "en-US,zh,zh-CN",
             "devicePixelRatio": 2,
             "colorDepth": 24,
-            "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36",
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36",
             "cookieEnabled": 1,
             "netEnabled": 1,
             "innerWidth": 377,
@@ -722,16 +721,6 @@ function get_w(gt, challenge, s, t) {
             , t = Math.random() * e * 9;
         t += e;
         r["st"] = Math.round(t).toString(16);
-        // 使用默认, ip可能需要更改
-        // var BvIc = {
-        //     "deviceorientation": false,
-        //     "mouseEvent": false,
-        //     "touchEvent": false,
-        //     "ip": undefined // 正常需要本机IP
-        // }
-        // r["deviceorientation"] = BvIc["deviceorientation"];
-        // r["touchEvent"] = BvIc["touchEvent"];
-        // r["internalip"] = BvIc["ip"];
         var n = [];
         Kscp(function (e) {
             var t = r[e];
