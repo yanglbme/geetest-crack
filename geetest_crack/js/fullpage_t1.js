@@ -144,16 +144,6 @@ function get_t(sstr) {
             }
             return i;
         }
-        // if (l && navigator["appName"] == "Microsoft Internet Explorer") {
-        //     ECgw["prototype"]["am"] = HspZ;
-        //     c = 30;
-        // } else if (l && navigator["appName"] != "Netscape") {
-        //     ECgw["prototype"]["am"] = GfOf;
-        //     c = 26;
-        // } else {
-        //     ECgw["prototype"]["am"] = IgTQ;
-        //     c = 28;
-        // }
         ECgw["prototype"]["am"] = IgTQ;
         c = 28;
 
