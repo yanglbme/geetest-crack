@@ -155,6 +155,7 @@ class GSession:
         return self.ajax_php(step=2, params=params)
 
     def run(self):
+        # 此处使用and操作符，当有某个请求返回false时，直接终止当前请求链
         self.set_gt_challenge() and self.get_php() and self.ajax_php() and self.get_slide_images() and self.get_track() and self.slide()
         logger.info('获取极验session结果：{}'.format(self.res))
         return self.res == Resp.SUCCESS
@@ -168,6 +169,8 @@ def produce_session():
             if gs.run():
                 res = pickle.dumps(gs.session)
                 client.zadd(geetest_session_key, {res: time.time()})
+                num = client.zcard(geetest_session_key)
+                logger.info('保存极验session到池子中，当前个数：{}'.format(num))
             else:
                 logger.error('获取极验session请求出错')
         except Exception as e:
@@ -187,7 +190,7 @@ def pop_session():
 
 
 def expire_schedule():
-    """定期删除"""
+    """定期删除1小时前的session，达到过期效果"""
     client.zremrangebyscore(geetest_session_key, 0, time.time() - 3600)
     timer = threading.Timer(2, expire_schedule)
     timer.start()
@@ -198,7 +201,7 @@ def check_session_pool():
     while True:
         num = client.zcard(geetest_session_key)
         if num < min_threshold:
-            # 此处可以自行设置告警
+            # 此处可以自行设置告警，及时通知开发人员
             logger.error('极验Session池数量不足{}个，请关注，当前数量：{}'.format(min_threshold, num))
             time.sleep(max_sleep_time)
         time.sleep(min_sleep_time)
