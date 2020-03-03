@@ -38,6 +38,18 @@ retry_max_number = 10
 retry_min_random_wait = 1000  # ms
 retry_max_random_wait = 5000  # ms
 
+# redis key
+geetest_session_key = 'GEETEST:SESSION'
+
+# params
+min_threshold = 100
+min_sleep_time = 10
+max_sleep_time = 6 * 60 * 60
+
+# expire time
+expire_time = 24 * 60 * 60
+expire_7_days = 7 * 24 * 60 * 60
+
 # sliding track
 slide_track = [
     [[-32, -26, 0], [0, 0, 0], [0, 0, 135], [2, 0, 143], [4, 0, 150], [6, 0, 159], [8, 0, 167], [11, 0, 174],

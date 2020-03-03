@@ -1,47 +1,54 @@
 import json
+import pickle
 import re
+import threading
+import time
 from io import BytesIO
+from threading import Thread
 
 from PIL import Image
+from redis import Redis
+from requests import session
 
-from geetest_crack.config import common_login_headers, gt_register_url, get_php_url, ajax_php_url, app_id, device_type, \
-    redirect_flag, sign_type, acc_login_url, login_success_handler_url, prefix_url
-from geetest_crack.param import get_s, get_encrypt_pwd, get_jt_safe_key, get_token, get_device, get_full_page_w1, \
-    get_full_page_w2, session, get_track, get_slide_w
-from geetest_crack.utils.captcha import calculate_offset
-from geetest_crack.utils.fetch import fetch
-from geetest_crack.utils.response import Resp
-from geetest_crack.utils.times import now_str
+from config import gt_register_url, common_login_headers, get_php_url, ajax_php_url, prefix_url, geetest_session_key, \
+    min_threshold, max_sleep_time, min_sleep_time
+from param import get_full_page_w1, get_full_page_w2, get_track, get_slide_w, get_s
+from utils.captcha import calculate_offset
+from utils.fetch import fetch
+from utils.logger import logger
+from utils.response import Resp
+from utils.times import now_str
+
+# 请在机器上安装redis，再使用
+client = Redis()
 
 
-class LoginSpider:
-    def __init__(self, phone, password):
-        self.login_name = str(phone)
-        self.login_pwd = get_encrypt_pwd(password)
-        self.s = get_s()
+class GSession:
+    """获取极验Session"""
+
+    def __init__(self):
+        self.session = session()
+        self.res = Resp.SUCCESS
         self.gt = str()
         self.challenge = str()
-        self.bg_url = str()
-        self.full_bg_url = str()
-        self.track = list()
+        self.s = get_s()
         self.validate = str()
         self.sec_code = str()
+        self.bg_url = str()
+        self.full_bg_url = str()
         self.offset = 0
-        self.session = session()
-        self.jt_safe_key = get_jt_safe_key()
-        self.device_id = get_device()
-        self.device_ip = get_device()
-        self.token = get_token(self.session, phone, self.device_id, self.device_ip)
-        self.res = Resp.SUCCESS
+        self.track = list()
 
     def set_gt_challenge(self) -> bool:
         """发送网络请求，拿到gt和challenge"""
         params = dict(t=now_str())
         resp = fetch(self.session, url=gt_register_url, headers=common_login_headers, params=params)
         if resp is None:
+            logger.warning('无法获取gt/challenge...')
             self.res = Resp.TIMEOUT
             return False
         res = resp.json()
+        logger.info('gt/challenge请求结果：{}'.format(res))
         self.gt, self.challenge = res['gt'], res['challenge']
         return True
 
@@ -56,6 +63,7 @@ class LoginSpider:
         }
         resp = fetch(self.session, url=get_php_url, headers=common_login_headers, params=params)
         if resp is None:
+            logger.warning('无法注册参数s...')
             self.res = Resp.TIMEOUT
         return resp is not None
 
@@ -97,7 +105,7 @@ class LoginSpider:
             'protocol': 'https://',
             'offline': 'false',
             'product': 'popup',
-            'api_server': 'captcha-api.pingan.com',
+            'api_server': 'captcha-api.com',
             'width': '100%',
             'callback': 'geetest_' + now_str()
         }
@@ -110,7 +118,7 @@ class LoginSpider:
         # 获得滑动验证码图片的URL(带缺口+不带缺口)
         self.bg_url = prefix_url + res['data']['bg']
         self.full_bg_url = prefix_url + res['data']['fullbg']
-
+        logger.info('滑动验证码图片,bg_url:{}, full_bg_url:{}'.format(self.bg_url, self.full_bg_url))
         # 更新gt/challenge
         self.gt = res['data']['gt']
         self.challenge = res['data']['challenge']
@@ -146,55 +154,61 @@ class LoginSpider:
         }
         return self.ajax_php(step=2, params=params)
 
-    def login(self):
-        """携带各个加密参数登录"""
-        form_data = {
-            'appId': app_id,
-            'loginName': self.login_name,
-            'loginPwd': self.login_pwd,
-            'geetest_challenge': self.challenge,
-            'geetest_validate': self.validate,
-            'geetest_seccode': self.sec_code,
-            'deviceId': self.device_id,
-            'deviceIp': self.device_ip,
-            'deviceType': device_type,
-            'jtSafeKey': self.jt_safe_key,
-            'token': self.token,
-            'fcmmRedirectFlag': redirect_flag,
-            'signtype': sign_type
-        }
-
-        resp = fetch(self.session, url=acc_login_url, method='post', headers=common_login_headers, data=form_data)
-        if resp is None:
-            self.res = Resp.TIMEOUT
-            return False
-        res = resp.json()
-        if res['returnCode'] != '0':
-            if res['returnCode'] == 'BIZ_ERROR_018' and '账户名或密码错误' in res['returnMsg']:
-                self.res = Resp.WRONG_NAME_OR_PWD
-            if res['returnCode'] == 'COMMON_ERROR_022':
-                self.res = Resp.ILLEGAL_ERR
-            return False
-
-        result_token = resp.json()['data']['resultToken']
-        form_data = {
-            'appId': app_id,
-            'assert': '',
-            'assertSign': '',
-            'des3Assert': '',
-            'des3AssertSign': '',
-            'resultToken': result_token,
-            'ptag': ''
-        }
-
-        resp = fetch(self.session, url=login_success_handler_url, method='post', headers=common_login_headers,
-                     data=form_data)
-        return resp is not None
-
     def run(self):
-        self.set_gt_challenge() and self.get_php() and self.ajax_php() and self.get_slide_images() and self.get_track() and self.slide() and self.login()
-        print(self.res)
+        self.set_gt_challenge() and self.get_php() and self.ajax_php() and self.get_slide_images() and self.get_track() and self.slide()
+        logger.info('获取极验session结果：{}'.format(self.res))
+        return self.res == Resp.SUCCESS
 
 
-spider = LoginSpider('13317178767', 'x12345678')
-spider.run()
+def produce_session():
+    """生产极验session"""
+    while True:
+        gs = GSession()
+        try:
+            if gs.run():
+                res = pickle.dumps(gs.session)
+                client.zadd(geetest_session_key, {res: time.time()})
+            else:
+                logger.error('获取极验session请求出错')
+        except Exception as e:
+            logger.error('获取极验session失败，错误信息：{}'.format(e))
+        time.sleep(4)
+
+
+def pop_session():
+    """从池子中弹出极验session"""
+    res = client.zrevrange(geetest_session_key, 0, 0, withscores=True)
+    if res:
+        g_session, score = res[0]
+        g_session = pickle.loads(g_session)
+        client.zremrangebyscore(geetest_session_key, min=score, max=score)
+        return g_session
+    return None
+
+
+def expire_schedule():
+    """定期删除"""
+    client.zremrangebyscore(geetest_session_key, 0, time.time() - 3600)
+    timer = threading.Timer(2, expire_schedule)
+    timer.start()
+
+
+def check_session_pool():
+    """检查session池子"""
+    while True:
+        num = client.zcard(geetest_session_key)
+        if num < min_threshold:
+            # 此处可以自行设置告警
+            logger.error('极验Session池数量不足{}个，请关注，当前数量：{}'.format(min_threshold, num))
+            time.sleep(max_sleep_time)
+        time.sleep(min_sleep_time)
+
+
+if __name__ == '__main__':
+
+    threads = [Thread(target=produce_session) for _ in range(4)] + [Thread(target=expire_schedule)] + [
+        Thread(target=check_session_pool)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
