@@ -210,8 +210,8 @@ def get_slide_w(gt, challenge, s, offset, track):
 ## 特殊的优化方式是什么？
 上文还提到一种特殊的优化方式，其实就是**极验 Session 验证码池的设计**。我们通过测试发现，并非需要在每个登录任务来的时候，再去解密参数，进而滑动验证码。我们其实可以预先滑动好验证码（其实就是发请求），然后把得到成功响应的 Session 存起来，放在一个池子中。这样做的好处主要有 2 点：
 
-1. 提供登录效率，缩减耗时；
-2. 提供数据采集程序的健壮性。
+1. 提高登录效率，缩减耗时；
+2. 提高数据采集程序的健壮性。
 
 当有登录任务过来的时候，我们从池子中取出一个极验 Session，加上登录任务中的用户名/密码(按照XX官网，密码还需做加密)直接去登录，是不是既简单又高效呢？
 
@@ -417,6 +417,68 @@ if __name__ == '__main__':
 
     for thread in thread_list:
         thread.join()
+
+```
+
+运行日志如下：
+
+```
+2020-04-01 15:38:57 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/1e6ca4d3f/bg/0acfd4d64.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/1e6ca4d3f/1e6ca4d3f.jpg
+2020-04-01 15:39:00 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:00 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:01 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:01 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': '49bf36f101312f382b66670af7a6061f', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:03 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/61ffa98e8/bg/8627cc65f.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/61ffa98e8/61ffa98e8.jpg
+2020-04-01 15:39:04 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': '2241ffcb990425fd1f4d93a06dd1ffb1', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:05 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': '8f6168ebdfd8561d6f14d2d8973dcaa3', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:05 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': '9926b4297f6ed6df614e68dafafa58e6', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:06 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/d49a453dc/bg/fc62c5927.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/d49a453dc/d49a453dc.jpg
+2020-04-01 15:39:06 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:06 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/cac640dea/bg/ec34f0e13.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/cac640dea/cac640dea.jpg
+2020-04-01 15:39:06 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/ebc5e54b4/bg/ca96d4224.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/ebc5e54b4/ebc5e54b4.jpg
+2020-04-01 15:39:11 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:11 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:11 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': '61556a44d32a9786b61ab8afbea3989b', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:11 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:12 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/cd0bbb6fe/bg/2f991caf7.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/cd0bbb6fe/cd0bbb6fe.jpg
+2020-04-01 15:39:15 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': '0df340035700753080348c13eadacbd4', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:15 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:15 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': '5c192a8d548da735c393fce93df17b00', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:15 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': '9389c0cefacfca69e39ab2aee20b4fda', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:17 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/1e6ca4d3f/bg/2a98c1588.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/1e6ca4d3f/1e6ca4d3f.jpg
+2020-04-01 15:39:17 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/1e6ca4d3f/bg/5283e2318.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/1e6ca4d3f/1e6ca4d3f.jpg
+2020-04-01 15:39:17 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/9264fff13/bg/2e0bb3330.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/9264fff13/9264fff13.jpg
+2020-04-01 15:39:20 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': '9e532863e31fc59138438fba5d19b6ea', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:21 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:22 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:22 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:22 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/1e6ca4d3f/bg/b0dbbc9c5.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/1e6ca4d3f/1e6ca4d3f.jpg
+2020-04-01 15:39:25 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:26 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': '2e5da172682aade75ac8482b74a7a074', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:26 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': '280aaee468f6e344c72e2e4408062405', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:27 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': '9d5e8bfe23eeec059dd79d890c83d6d7', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:28 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/61ffa98e8/bg/285b1330f.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/61ffa98e8/61ffa98e8.jpg
+2020-04-01 15:39:28 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/e840d69cc/bg/6c86e0ad3.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/e840d69cc/e840d69cc.jpg
+2020-04-01 15:39:28 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/e44c02efd/bg/de65f3a21.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/e44c02efd/e44c02efd.jpg
+2020-04-01 15:39:30 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': 'd6062fc656baa01571ee5245831e4496', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:32 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.TRACK_ERR
+2020-04-01 15:39:32 geetest_session.py [line:167] ERROR: 获取极验session请求出错
+2020-04-01 15:39:32 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:32 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/1e6ca4d3f/bg/90861c73f.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/1e6ca4d3f/1e6ca4d3f.jpg
+2020-04-01 15:39:33 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:35 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:36 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': '0b0ac922cf5fe2d5b9060dd423dc4e23', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:36 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': '9c2c6c18f9adbb8db92b3ecc644f2f9e', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:37 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': 'ac1a20b54708caf252eb28a236da7ce8', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:38 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/cd0bbb6fe/bg/723c2109a.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/cd0bbb6fe/cd0bbb6fe.jpg
+2020-04-01 15:39:39 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/e44c02efd/bg/f95abf82a.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/e44c02efd/e44c02efd.jpg
+2020-04-01 15:39:39 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/9264fff13/bg/0e2c237a6.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/9264fff13/9264fff13.jpg
+2020-04-01 15:39:40 geetest_session.py [line:46] INFO: gt/challenge请求结果：{'challenge': 'b0366c16750ccaef2366d07806e643ca', 'gt': '29414567350546096e14bb2bc6319ae1', 'success': 1}
+2020-04-01 15:39:43 geetest_session.py [line:116] INFO: 滑动验证码图片,bg_url:https://captcha-static.pingan.com/pictures/gt/e840d69cc/bg/a310a9fa0.jpg, full_bg_url:https://captcha-static.pingan.com/pictures/gt/e840d69cc/e840d69cc.jpg
+2020-04-01 15:39:43 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:43 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:44 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
+2020-04-01 15:39:46 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
 
 ```
 
