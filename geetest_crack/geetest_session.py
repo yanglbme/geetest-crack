@@ -48,7 +48,7 @@ class GSession:
             self.res = Resp.TIMEOUT
             return False
         res = resp.json()
-        logger.info('gt/challenge请求结果：{}'.format(res))
+        logger.info(f'gt/challenge请求结果：{res}')
         self.gt, self.challenge = res['gt'], res['challenge']
         return True
 
@@ -118,7 +118,7 @@ class GSession:
         # 获得滑动验证码图片的URL(带缺口+不带缺口)
         self.bg_url = prefix_url + res['data']['bg']
         self.full_bg_url = prefix_url + res['data']['fullbg']
-        logger.info('滑动验证码图片,bg_url:{}, full_bg_url:{}'.format(self.bg_url, self.full_bg_url))
+        logger.info(f'滑动验证码图片,bg_url:{self.bg_url}, full_bg_url:{self.full_bg_url}')
         # 更新gt/challenge
         self.gt = res['data']['gt']
         self.challenge = res['data']['challenge']
@@ -157,7 +157,7 @@ class GSession:
     def run(self):
         # 此处使用and操作符，当有某个请求返回false时，直接终止当前请求链
         self.set_gt_challenge() and self.get_php() and self.ajax_php() and self.get_slide_images() and self.get_track() and self.slide()
-        logger.info('获取极验session结果：{}'.format(self.res))
+        logger.info(f'获取极验session结果：{self.res}')
         return self.res == Resp.SUCCESS
 
 
@@ -170,11 +170,11 @@ def produce_session():
                 res = pickle.dumps(gs.session)
                 client.zadd(geetest_session_key, {res: time.time()})
                 num = client.zcard(geetest_session_key)
-                logger.info('保存极验session到池子中，当前个数：{}'.format(num))
+                logger.info(f'保存极验session到池子中，当前个数：{num}')
             else:
                 logger.error('获取极验session请求出错')
         except Exception as e:
-            logger.error('获取极验session失败，错误信息：{}'.format(e))
+            logger.error(f'获取极验session失败，错误信息：{e}')
         time.sleep(4)
 
 
@@ -202,16 +202,13 @@ def check_session_pool():
         num = client.zcard(geetest_session_key)
         if num < min_threshold:
             # 此处可以自行设置告警，及时通知开发人员
-            logger.error('极验Session池数量不足{}个，请关注，当前数量：{}'.format(min_threshold, num))
+            logger.error(f'极验Session池数量不足{min_threshold}个，请关注，当前数量：{num}')
             time.sleep(max_sleep_time)
         time.sleep(min_sleep_time)
 
 
 if __name__ == '__main__':
-
     threads = [Thread(target=produce_session) for _ in range(4)] + [Thread(target=expire_schedule)] + [
         Thread(target=check_session_pool)]
     for thread in threads:
         thread.start()
-    for thread in threads:
-        thread.join()
