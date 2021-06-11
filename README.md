@@ -293,6 +293,9 @@ def get_slide_w(gt, challenge, s, offset, track):
 2020-04-01 15:39:46 geetest_session.py [line:154] INFO: 获取极验session结果：Resp.SUCCESS
 ```
 
----
-
 以上，全篇完！
+
+
+## 声明
+
+本项目仅供学习交流使用，请勿用于非法用途！
